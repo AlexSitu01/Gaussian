@@ -1,9 +1,9 @@
-import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Stack;
 
 public class Main {
     public static void main(String[] args) {
-
 
         //creating test matrix
         float[][] matrix = new float[3][4];
@@ -21,7 +21,7 @@ public class Main {
         matrix[2][3] = 9;
         ArrayList<Float> scale_factors;
         ArrayList<Float> scale_ratios = new ArrayList<>();
-
+    //creates final matrix
     for(int currentPivotRow = 0; currentPivotRow< matrix.length-1; currentPivotRow++) {
         System.out.println("Count: " + currentPivotRow);
         scale_factors = scaleFactors(matrix, currentPivotRow);
@@ -54,8 +54,26 @@ public class Main {
         scale_ratios.clear();
         multipliers.clear();
     }
-    }
+        ArrayList<Float> solutions = solveVariables(matrix);
+        System.out.println("Solution: " + solutions);
 
+    }
+    public static ArrayList<Float> solveVariables(float[][] matrix) {
+        int numRows = matrix.length;
+        int numCols = matrix[0].length-1;
+
+        ArrayList<Float> solution = new ArrayList<>(Collections.nCopies(numCols, 0.0f));
+
+        for (int row = numRows - 1; row >= 0; row--) {
+            float sum = 0;
+            for (int col = row + 1; col < numCols; col++) {
+                sum += matrix[row][col] * solution.get(col);
+            }
+            solution.set(row, (matrix[row][numCols] - sum) / matrix[row][row]);
+        }
+
+        return solution;
+    }
     public static void printMatrix(float[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
             System.out.print("[");
@@ -74,11 +92,10 @@ public class Main {
         float[] temp = mat[row1];
         mat[row1] = mat[row2];
         mat[row2] = temp;
-        printMatrix(mat);
     }
 
     public static ArrayList<Float> scaleFactors(float[][] mat, int pivotRow) {
-        ArrayList<Float> scalefactors = new ArrayList<Float>();
+        ArrayList<Float> scalefactors = new ArrayList<>();
         for (int i = pivotRow; i < mat.length; i++) {
             float max = mat[i][0];
             //go through each row and find max excluding last number
