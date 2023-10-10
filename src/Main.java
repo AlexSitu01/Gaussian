@@ -1,24 +1,66 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Stack;
+import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    
+    public static void populateMatrixFromFile(float[][] matrix) throws FileNotFoundException {
+        System.out.println("Enter file path: ");
+        Scanner scnr = new Scanner(System.in);
+        Scanner fileScnr = new Scanner(new File(scnr.nextLine()));
+        scnr.close();
 
-        //creating test matrix
-        float[][] matrix = new float[3][4];
-        matrix[0][0] = 2;
-        matrix[0][1] = 3;
-        matrix[0][2] = 0;
-        matrix[0][3] = 8;
-        matrix[1][0] = -1;
-        matrix[1][1] = 2;
-        matrix[1][2] = -1;
-        matrix[1][3] = 0;
-        matrix[2][0] = 3;
-        matrix[2][1] = 0;
-        matrix[2][2] = 2;
-        matrix[2][3] = 9;
+        for (float[] row : matrix) {
+            for (int i = 0; i < row.length; i++) {
+                row[i] = fileScnr.nextFloat(); 
+            }
+        }
+        fileScnr.close();
+    }
+    public static void populateMatrixFromUserInput(float[][] matrix) {
+        Scanner scnr = new Scanner(System.in);
+        for (int row = 0; row < matrix.length; row++) {
+            System.out.println("Enter row " + row + "'s values: ");
+            String[] values = scnr.nextLine().split(" ");
+            for (int column = 0; column < matrix[row].length; column++) {
+                matrix[row][column] = Float.parseFloat(values[column]);
+            }
+        }
+        scnr.close();
+    }
+    public static void main(String[] args) {
+        Scanner scnr = new Scanner(System.in);
+        System.out.println("How many linear equations do you want to solve for?: ");
+        int numEquations = scnr.nextInt();
+        float[][] matrix = new float[numEquations][numEquations+1];
+
+        System.out.println("How do you want to enter the matrix \n1. Enter matrix manually \n2. Read from file\n");
+        int userChoice = scnr.nextInt();
+
+        if(userChoice == 1){
+            populateMatrixFromUserInput(matrix);
+        }
+        else if(userChoice ==2 ){
+
+            //creating matrix
+            boolean notDone = true; 
+            while(notDone){
+                try{populateMatrixFromFile(matrix);
+                    notDone = false;
+                }
+                catch(FileNotFoundException expec){
+                    System.out.println("The file inputted can't be found.");
+                }
+            }
+        }
+        else{
+            return;
+        }
+        
         ArrayList<Float> scale_factors;
         ArrayList<Float> scale_ratios = new ArrayList<>();
     //creates final matrix
@@ -92,6 +134,7 @@ public class Main {
         float[] temp = mat[row1];
         mat[row1] = mat[row2];
         mat[row2] = temp;
+        printMatrix(mat);
     }
 
     public static ArrayList<Float> scaleFactors(float[][] mat, int pivotRow) {
